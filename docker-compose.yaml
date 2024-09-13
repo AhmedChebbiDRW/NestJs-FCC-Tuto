@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: spotify-postgres
+    ports:
+      - ${DATABASE_PORT}:5432
+    volumes:
+      - spotify-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+  maildev:
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    container_name: mailer
+    ports:
+      - ${MAIL_CLIENT_PORT}:1083
+      - ${MAIL_PORT}:1025
+
+  adminer:
+    image: adminer
+    container_name: spotify-adminer
+    restart: always
+    ports:
+      - 8083:8080
+
+networks:
+  observability:
+    name: observability
+
+volumes:
+  spotify-db:
